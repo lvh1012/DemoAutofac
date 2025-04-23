@@ -1,0 +1,6 @@
+@DemoAutofac_HostAddress = http://localhost:5226
+
+GET {{DemoAutofac_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
