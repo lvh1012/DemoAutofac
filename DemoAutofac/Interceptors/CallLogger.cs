@@ -2,7 +2,7 @@
 
 namespace DemoAutofac.Interceptors;
 
-public class CallLogger(TextWriter output) : IInterceptor
+public class CallLogger(TextWriter output, IAsyncInterceptor asyncInterceptor) : IInterceptor
 {
     public void Intercept(IInvocation invocation)
     {
@@ -10,7 +10,7 @@ public class CallLogger(TextWriter output) : IInterceptor
             invocation.Method.Name,
             string.Join(", ", invocation.Arguments.Select(a => (a ?? "").ToString()).ToArray()));
 
-        invocation.Proceed();
+        asyncInterceptor.ToInterceptor().Intercept(invocation);
 
         output.WriteLine("Done: result was {0}.", invocation.ReturnValue);
     }

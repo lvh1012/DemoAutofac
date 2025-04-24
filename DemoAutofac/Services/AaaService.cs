@@ -6,7 +6,7 @@ namespace DemoAutofac.Services;
 
 // This attribute will look for a TYPED
 // interceptor registration:
-[Intercept(typeof(CallLogger))]
+// [Intercept(typeof(CallLogger))]
 public class AaaService: IAaaService
 {
     public void DoSomething()

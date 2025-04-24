@@ -25,17 +25,20 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 // Autofac registrations go here
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-    // // When you register components, you have to tell Autofac which services (Interface) that component exposes.
-    // containerBuilder.RegisterType<UserRepo>()
-    //                 .As<IUserRepo>()
-    //                 .InstancePerLifetimeScope();
+    // When you register components, you have to tell Autofac which services (Interface) that component exposes.
+    containerBuilder.RegisterType<UserRepo>()
+                    .As<IUserRepo>()
+                    .EnableInterfaceInterceptors()
+                    .InterceptedBy(typeof(CallLogger))
+                    .InstancePerLifetimeScope();
 
     var dataAccess = Assembly.GetExecutingAssembly();
 
-    containerBuilder.RegisterAssemblyTypes(dataAccess)
-                    .Where(t => t.Name.EndsWith("Repo"))
-                    .AsImplementedInterfaces()
-                    .InstancePerLifetimeScope();
+    // containerBuilder.RegisterAssemblyTypes(dataAccess)
+    //                 .Where(t => t.Name.EndsWith("Repo"))
+    //                 .AsImplementedInterfaces()
+    //                 .InterceptedBy(typeof(CallLogger))
+    //                 .InstancePerLifetimeScope();
 
     containerBuilder.RegisterType<AaaService>()
                     .As<IAaaService>()
@@ -44,6 +47,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.Register((IAaaService aaaService) => new BbbService(aaaService) )
                     .As<IBbbService>()
                     .EnableInterfaceInterceptors()
+                    // .InterceptedBy(typeof(CallLogger))
                     .InstancePerLifetimeScope();
 
     // containerBuilder.RegisterGeneric(typeof(GenericRepository<>))
@@ -59,12 +63,19 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         ObeySpeedLimit = true
     });
 
+    containerBuilder.Register(c => new CallTransaction(Console.Out))
+                    .As<IAsyncInterceptor>()
+                    .InstancePerLifetimeScope();
+
     // Named registration
-    containerBuilder.Register(c => new CallLogger(Console.Out))
-           .Named<IInterceptor>("log-calls");
+    containerBuilder.Register(c => new CallLogger(Console.Out, c.Resolve<IAsyncInterceptor>()))
+           .Named<IInterceptor>("log-calls")
+           .InstancePerLifetimeScope();
 
     // Typed registration
-    containerBuilder.Register(c => new CallLogger(Console.Out));
+    containerBuilder.Register(c => new CallLogger(Console.Out, c.Resolve<IAsyncInterceptor>()))
+        .InstancePerLifetimeScope();
+
 });
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
-﻿using DemoAutofac.Entities;
+﻿using DemoAutofac.Attributes;
+using DemoAutofac.Entities;
 using DemoAutofac.Repositories.Interfaces;
 
 namespace DemoAutofac.Repositories;

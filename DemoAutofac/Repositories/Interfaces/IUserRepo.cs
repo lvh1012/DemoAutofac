@@ -2,5 +2,5 @@
 
 public interface IUserRepo: IRepo
 {
-    
+    Task<int> HelloAsync();
 }

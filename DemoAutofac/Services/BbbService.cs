@@ -5,7 +5,7 @@ namespace DemoAutofac.Services;
 
 // This attribute will look for a NAMED
 // interceptor registration:
-[Intercept("log-calls")]
+// [Intercept("log-calls")]
 public class BbbService(IAaaService aaaService): IBbbService
 {
     public void DoSomething()
