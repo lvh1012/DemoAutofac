@@ -34,6 +34,7 @@ public class WeatherForecastController : ControllerBase
         _vehicle = vehicle;
         _userRepo.Hello();
         _bbbService.DoSomething();
+        _bbbService.Test();
         _user.GetAll();
         _vehicle.DoSomething();
     }

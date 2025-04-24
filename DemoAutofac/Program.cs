@@ -1,6 +1,9 @@
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.DynamicProxy;
+using Castle.DynamicProxy;
+using DemoAutofac.Interceptors;
 using DemoAutofac.Modules;
 using DemoAutofac.Repositories;
 using DemoAutofac.Repositories.Interfaces;
@@ -36,9 +39,11 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 
     containerBuilder.RegisterType<AaaService>()
                     .As<IAaaService>()
+                    .EnableInterfaceInterceptors()
                     .InstancePerLifetimeScope();
     containerBuilder.Register((IAaaService aaaService) => new BbbService(aaaService) )
                     .As<IBbbService>()
+                    .EnableInterfaceInterceptors()
                     .InstancePerLifetimeScope();
 
     // containerBuilder.RegisterGeneric(typeof(GenericRepository<>))
@@ -53,6 +58,13 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterModule(new CarTransportModule() {
         ObeySpeedLimit = true
     });
+
+    // Named registration
+    containerBuilder.Register(c => new CallLogger(Console.Out))
+           .Named<IInterceptor>("log-calls");
+
+    // Typed registration
+    containerBuilder.Register(c => new CallLogger(Console.Out));
 });
 
 var app = builder.Build();
